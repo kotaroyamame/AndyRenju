@@ -19,6 +19,7 @@ export class Bord {
         return this.cellObj[n];
     }
     setStone(index, n: 0|1|2) {
+        console.log('setStone');
         this.cellObj[index].stone = n;
     }
 }

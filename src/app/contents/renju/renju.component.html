@@ -3,9 +3,9 @@
 </p>
 <div class="andyGomoku">
   <ul class="bord">
-    <li class="bord__cell" *ngFor="let i of bord.getCellKeys();">
-      <span class="bord__stone--white" *ngIf="bord.getCell(i).stone===1"></span>
-      <span class="bord__stone--black" *ngIf="bord.getCell(i).stone===2"></span>
+    <li class="bord__cell" *ngFor="let i of bord.getCellKeys();" (click)="bord.setStone(i,2);bot.setStone()">
+      <span class="bord__stone bord__stone--white" *ngIf="bord.getCell(i).stone==1"></span>
+      <span class="bord__stone bord__stone--black" *ngIf="bord.getCell(i).stone==2"></span>
     </li>
   </ul>
 </div>

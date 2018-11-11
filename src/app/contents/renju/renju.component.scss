@@ -4,22 +4,48 @@ $bordSize:15;
 .bord {
 	width: $bordWidth;
 	height: $bordWidth;
-
+	background-color: burlywood;
 	&__cell {
-		width: ($bordWidth/$bordSize) - 5px;
-		height: ($bordWidth/$bordSize) - 5px;
+		width: ($bordWidth/$bordSize);
+		height: ($bordWidth/$bordSize);
 		display: block;
-		background-color: #fff;
-		border: 1px #000 solid;
+		// background-color: #fff;
+		// border: 1px #000 solid;
 		float: left;
 		font-size: 30px;
 		text-align: center;
 		line-height: 50px;
+		position: relative;
+		&::before{
+			content:'';
+			position: absolute;
+			width:($bordWidth/$bordSize);
+			height:2px;
+			display: block;
+			background-color: #000;
+			top:0;left:0;right:0;bottom:0;
+			margin: auto;
+			z-index: 0;
+		}
+		&::after{
+			content:'';
+			position: absolute;
+			width:2px;
+			height:($bordWidth/$bordSize);
+			display: block;
+			background-color: #000;
+			top:0;left:0;right:0;bottom:0;
+			margin: auto;
+		}
 	}
 
 	&__stone {
+		position: absolute;
+		z-index: 1;
 		border-radius: 50%;
-
+		display:block;
+		width: ($bordWidth/$bordSize);
+		height: ($bordWidth/$bordSize);
 		&--white {
 			background-color: white;
 		}
