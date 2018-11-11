@@ -18,8 +18,10 @@ ul{
         width:100%;
         height:100%;
         text-decoration: none;
+        cursor: pointer;
     }
     &__list{
+        cursor: pointer;
         padding-left:30px;
         list-style: none;
         line-height:30px;
