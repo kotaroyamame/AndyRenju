@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { TopComponent } from './contents/top/top.component';
-import { RenjuComponent } from './renju/renju.component';
+import { RenjuComponent } from './contents/renju/renju.component';
+import { ChatComponent } from './contents/chat/chat.component';
 
 const routes: Routes = [
   {
@@ -9,8 +10,12 @@ const routes: Routes = [
     component: TopComponent,
   },
   {
-    path: 'renju/',
+    path: 'renju',
     component: RenjuComponent,
+  },
+  {
+    path: 'chat',
+    component: ChatComponent,
   }
 ];
 

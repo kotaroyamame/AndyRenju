@@ -1,0 +1,22 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+$headerHeight:300px;
+$sideberWidth:200px;
+app-root{
+    position: relative;
+}
+.iidesign{
+    &-header{
+        height:$headerHeight;
+    }
+    &-sideber{
+        position:absolute;
+        top:$headerHeight;
+        left:0px;
+        width:$sideberWidth;
+        background-color: #eeeeee;
+        height:100%;
+    }
+    &-content{
+        padding-left:$sideberWidth;
+    }
+}
