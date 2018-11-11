@@ -1,0 +1,31 @@
+$bordWidth:830px;
+$bordSize:15;
+
+.bord {
+	width: $bordWidth;
+	height: $bordWidth;
+
+	&__cell {
+		width: ($bordWidth/$bordSize) - 5px;
+		height: ($bordWidth/$bordSize) - 5px;
+		display: block;
+		background-color: #fff;
+		border: 1px #000 solid;
+		float: left;
+		font-size: 30px;
+		text-align: center;
+		line-height: 50px;
+	}
+
+	&__stone {
+		border-radius: 50%;
+
+		&--white {
+			background-color: white;
+		}
+
+		&--black {
+			background-color: #000;
+		}
+	}
+}

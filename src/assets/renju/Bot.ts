@@ -8,7 +8,7 @@ export class Bot {
         index = typeof index === 'number' ? index : parseInt(index, 10);
         let score = -1;
 
-        const bordCellObj = this.bord.CellObj;
+        const bordCellObj = this.bord.getCellObj();
         if (bordCellObj[index].stone !== 0) {
             return score;
         }
@@ -16,10 +16,9 @@ export class Bot {
 
         for (let i = 0; i < roundMap.length; i++) {
             if (bordCellObj.hasOwnProperty(roundMap[i] + index)) {
-                if (bordCellObj[roundMap[i] + index].stone == 1) {
+                if (bordCellObj[roundMap[i] + index].stone === 1) {
                     score = score + 1;
-                }
-                else if (bordCellObj[roundMap[i] + index].stone == 2) {
+                } else if (bordCellObj[roundMap[i] + index].stone === 2) {
                     score = score + 3;
                 }
             }
@@ -28,7 +27,8 @@ export class Bot {
     }
     setStone() {
         let cellScoreList = [];
-        const bordCellObj = this.bord.CellObj;
+        const bordCellObj = this.bord.getCellObj();
+        // tslint:disable-next-line:forin
         for (const index in bordCellObj) {
             const cell = bordCellObj[index];
             cellScoreList.push({ index: index, score: this.decision(index) });
@@ -41,7 +41,7 @@ export class Bot {
                 return 1;
             }
             return 0;
-        })
+        });
         this.bord.setStone(cellScoreList[0].index, 1);
     }
 }
