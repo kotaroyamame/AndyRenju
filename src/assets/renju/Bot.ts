@@ -1,8 +1,71 @@
 import {Bord} from './Bord';
+class Jadge {
+    constructor(private bord: Bord) {
+
+    }
+    // 0=石は置ける 1=すでにあるので置けない 2=反則で置けない
+    isPutStone(x: number, y: number, stone: 1|2): 0|1|2 {
+        this.bord.getStone(x, y);
+        return 0;
+    }
+    public isGemeOver(): 0|1|2 {
+        for ( let i = 0; i < this.bord.getCellSize(); i++) {
+            for ( let j = 1; j <= 8; j++) {
+                const {type, size} = this.search( Math.floor( i / this.bord.x), i % this.bord.y , j );
+                if (type === 1 && size === 5) {
+                    return 1;
+                } else if ( type === 2 && size >= 5) {
+                    return 2;
+                }
+            }
+        }
+        return 0;
+    }
+
+    private search( x: number, y: number, vc: 1|2|3|4|5|6|7|8|any , stack: Array<0|1|2>|any = []): {type: 0|1|2, size: number} {
+        if ( stack[0] !== 0) {
+            if ( this.bord.getStone(x, y) !== stack[0] ) {
+                return {type: stack[0], size: stack.length};
+            }
+            stack.push( this.bord.getStone(x, y));
+        } else if ( stack[0] === 0) {
+            return {type: 0, size: 0};
+        }
+        switch ( vc ) {
+            case 1: // 上方向
+            y = y - 1;
+            break;
+            case 2: // 右上方向
+            y = y - 1;
+            x = x + 1;
+            break;
+            case 3: // 右方向
+            x = x + 1;
+            break;
+            case 4: // 右下方向
+            y = y + 1;
+            x = x + 1;
+            break;
+            case 5: // 下方向
+            y = y + 1;
+            break;
+            case 6: // 左下方向
+            y = y + 1;
+            x = x - 1;
+            break;
+            case 7: // 左方向
+            x = x - 1;
+            break;
+            case 8: // 左上方向
+            y = y - 1;
+            x = x - 1;
+            break;
+        }
+        return this.search(x, y, vc, stack);
+    }
+}
 export class Bot {
-    bord: Bord;
-    constructor(bord: Bord) {
-        this.bord = bord;
+    constructor(private bord: Bord) {
     }
     decision(index: number|string) {
         index = typeof index === 'number' ? index : parseInt(index, 10);
@@ -45,3 +108,10 @@ export class Bot {
         this.bord.setStone(cellScoreList[0].index, 1);
     }
 }
+// function search(ar=[]){
+//     ar.push(1);
+//     if(ar.length>5){
+//         return ar;
+//     }
+//     return search(ar);
+// }
