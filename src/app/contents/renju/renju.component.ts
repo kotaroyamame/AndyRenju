@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Bot } from 'src/assets/renju/Bot';
+import { Bot , Jadge, GameController } from 'src/assets/renju/Bot';
 import { Bord } from 'src/assets/renju/Bord';
 @Component({
   selector: 'app-renju',
@@ -7,13 +7,13 @@ import { Bord } from 'src/assets/renju/Bord';
   styleUrls: ['./renju.component.scss']
 })
 export class RenjuComponent implements OnInit {
-  bord: Bord;
-  bot: Bot;
+  gameController: GameController;
+  kekka = '';
   constructor() { }
 
   ngOnInit() {
-    this.bord = new Bord(15);
-    this.bot = new Bot(this.bord);
+
+    this.gameController = new GameController(new Bord(15));
   }
 
 }

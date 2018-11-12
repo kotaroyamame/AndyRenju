@@ -1,17 +1,21 @@
 import {Bord} from './Bord';
-class Jadge {
+export class Jadge {
     constructor(private bord: Bord) {
 
     }
-    // 0=石は置ける 1=すでにあるので置けない 2=反則で置けない
-    isPutStone(x: number, y: number, stone: 1|2): 0|1|2 {
-        this.bord.getStone(x, y);
-        return 0;
+    // 1=石は置ける 0=すでにあるので置けない -1=反則で置けない
+    isPutStone(x: number, y: number, stone: 1|2): 0|1|-1 {
+        const pt = this.bord.getStone(x, y);
+        if ( pt === 1 || pt === 2) {
+            return 0;
+        }
+        return 1;
     }
     public isGemeOver(): 0|1|2 {
         for ( let i = 0; i < this.bord.getCellSize(); i++) {
             for ( let j = 1; j <= 8; j++) {
                 const {type, size} = this.search( Math.floor( i / this.bord.x), i % this.bord.y , j );
+                console.log(size);
                 if (type === 1 && size === 5) {
                     return 1;
                 } else if ( type === 2 && size >= 5) {
@@ -23,8 +27,8 @@ class Jadge {
     }
 
     private search( x: number, y: number, vc: 1|2|3|4|5|6|7|8|any , stack: Array<0|1|2>|any = []): {type: 0|1|2, size: number} {
-        if ( stack[0] !== 0) {
-            if ( this.bord.getStone(x, y) !== stack[0] ) {
+        if (stack.length === 0 || stack[0] !== 0) {
+            if ( stack.length !== 0 && this.bord.getStone(x, y) !== stack[0] ) {
                 return {type: stack[0], size: stack.length};
             }
             stack.push( this.bord.getStone(x, y));
@@ -106,6 +110,29 @@ export class Bot {
             return 0;
         });
         this.bord.setStone(cellScoreList[0].index, 1);
+    }
+}
+export class GameController {
+    is_user = true;
+    winner = '';
+    jadge: Jadge;
+    bot: Bot;
+    constructor(public bord: Bord) {
+        this.jadge = new Jadge(this.bord);
+        this.bot = new Bot(this.bord);
+    }
+    setStone(n) {
+        this.bord.setStone(n , this.is_user ? 1 : 2 );
+        this.is_user = !this.is_user;
+        this.is_win();
+    }
+    is_win() {
+        const k = this.jadge.isGemeOver();
+        if ( k === 1 ) {
+            this.winner = '先手の勝ちです';
+        } else if ( k === 2) {
+            this.winner = '後手の勝ちです';
+        }
     }
 }
 // function search(ar=[]){
