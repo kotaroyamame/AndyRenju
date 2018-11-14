@@ -1,8 +1,6 @@
 import { Bord } from './Bord';
 export class Jadge {
-	constructor(private bord: Bord) {
-
-	}
+	constructor(private bord: Bord) {}
 	// 1=石は置ける 0=すでにあるので置けない -1=反則で置けない
 	isPutStone(x: number, y: number, stone: 1 | 2): 0 | 1 | -1 {
 		const pt = this.bord.getStone(x, y);
@@ -14,7 +12,8 @@ export class Jadge {
 
 	public isGemeOver(n: number): 0 | 1 | 2 {
 		for (let j = 1; j <= 4; j++) {
-			const { type, size } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			const { type, size , edgeScore} = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			console.log(edgeScore);
 			if (type === 1 && size === 5) {
 				return 1;
 			} else if (type === 2 && size >= 5) {
@@ -23,20 +22,7 @@ export class Jadge {
 		}
 		return 0;
 	}
-	// public isGemeOver(n: number): 0|1|2 {
-	//     for ( let i = 0; i < this.bord.getCellSize(); i++) {
-	//         for ( let j = 1; j <= 8; j++) {
-	//             const {type, size} = this.search( Math.floor( i / this.bord.x), i % this.bord.y , j );
-	//             console.log(size);
-	//             if (type === 1 && size === 5) {
-	//                 return 1;
-	//             } else if ( type === 2 && size >= 5) {
-	//                 return 2;
-	//             }
-	//         }
-	//     }
-	//     return 0;
-	// }
+
 	private advance(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any): Array<number> {
 		switch (vc) {
 			case 1: // 上方向
@@ -70,7 +56,7 @@ export class Jadge {
 		}
 		return [x, y];
 	}
-	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number } {
+	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
 		if (stack.length === 0 || stack[0] !== 0) {
 			if (stack.length !== 0 && this.bord.getStone(x, y) !== stack[0]) {
 				// 反転して最初から一つ進む
@@ -82,12 +68,20 @@ export class Jadge {
 					}
 					return this.search(x, y, vc, stack);
 				} else {
-					return { type: stack[0], size: stack.length };
+					// edgeScore 石の端の空間が空いているかどうか、0空いてない 1一方こうだけ空いてる 2両方空いてる
+					let edgeScore = this.bord.getStone(x, y) === 0 ? 1 : 0;
+					vc -= 4;
+					for (let i = 0; i < stack.length + 1; i++) {
+						const [_x, _y] = this.advance(x, y, vc);
+						x = _x; y = _y;
+					}
+					edgeScore += this.bord.getStone(x, y) === 0 ? 1 : 0;
+					return { type: stack[0], size: stack.length, edgeScore: edgeScore };
 				}
 			}
 			stack.push(this.bord.getStone(x, y));
 		} else if (stack[0] === 0) {
-			return { type: 0, size: 0 };
+			return { type: 0, size: 0, edgeScore: 0 };
 		}
 		// tslint:disable-next-line:no-unused-expression
 		const [__x, __y] = this.advance(x, y, vc);
