@@ -13,8 +13,8 @@ export class Jadge {
 	}
 
 	public isGemeOver(n: number): 0 | 1 | 2 {
-		for (let j = 1; j <= 8; j++) {
-			const { type, size } = this.search( n % this.bord.y, Math.floor(n / this.bord.x), j);
+		for (let j = 1; j <= 4; j++) {
+			const { type, size } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
 			if (type === 1 && size === 5) {
 				return 1;
 			} else if (type === 2 && size >= 5) {
@@ -37,16 +37,7 @@ export class Jadge {
 	//     }
 	//     return 0;
 	// }
-
-	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number } {
-		if (stack.length === 0 || stack[0] !== 0) {
-			if (stack.length !== 0 && this.bord.getStone(x, y) !== stack[0]) {
-				return { type: stack[0], size: stack.length };
-			}
-			stack.push(this.bord.getStone(x, y));
-		} else if (stack[0] === 0) {
-			return { type: 0, size: 0 };
-		}
+	private advance(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any): Array<number> {
 		switch (vc) {
 			case 1: // 上方向
 				y = y - 1;
@@ -77,6 +68,30 @@ export class Jadge {
 				x = x - 1;
 				break;
 		}
+		return [x, y];
+	}
+	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number } {
+		if (stack.length === 0 || stack[0] !== 0) {
+			if (stack.length !== 0 && this.bord.getStone(x, y) !== stack[0]) {
+				// 反転して最初から一つ進む
+				if (vc <= 4) {
+					vc += 4;
+					for (let i = 0; i < stack.length + 1; i++) {
+						const [_x, _y] = this.advance(x, y, vc);
+						x = _x; y = _y;
+					}
+					return this.search(x, y, vc, stack);
+				} else {
+					return { type: stack[0], size: stack.length };
+				}
+			}
+			stack.push(this.bord.getStone(x, y));
+		} else if (stack[0] === 0) {
+			return { type: 0, size: 0 };
+		}
+		// tslint:disable-next-line:no-unused-expression
+		const [__x, __y] = this.advance(x, y, vc);
+		x = __x; y = __y;
 		return this.search(x, y, vc, stack);
 	}
 }
