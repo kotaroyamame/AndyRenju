@@ -144,40 +144,27 @@ export class Bot {
 			for (let j = 1; j <= 4; j++) {
 				const { type, size, edgeScore } = jadge.searchByN(index, j);
 				if (type !== stone) {
-					score += Math.pow(size - 1, 2) + Math.pow(edgeScore, 2);
+					score += Math.pow(size - 1, 3) + Math.pow(edgeScore, 4);
 				} else {
-					score += Math.pow(size - 1, 2) + Math.pow(edgeScore, 2);
+					score += Math.pow(size - 1, 3) + Math.pow(edgeScore, 4);
 				}
 
 			}
 			console.log(score);
-			if (count <= 0 || score <= 28) {
+			if (count <= 0 || score <= 64) {
 				return score;
 			}
 			mindBord.getStoneByN(index);
 			const bordCellObj = mindBord.getCellObj();
 			let maxCellScore = null;
-			// let minCellScore = null;
 			// tslint:disable-next-line:forin
 			for (const _index in bordCellObj) {
-				// const cell = bordCellObj[_index];
 				const cellScore = { index: _index, score: this.decision(mindBord, _index, stone === 1 ? 2 : 1, count--) };
-				// if (stone === 1) {
 				if (maxCellScore === null || maxCellScore.score < cellScore.score) {
 					maxCellScore = cellScore;
 				}
-				// } else {
-				// 	if (minCellScore === null || minCellScore.score > cellScore.score) {
-				// 		minCellScore = cellScore;
-				// 	}
-				// }
-
 			}
-			// if (stone === 1) {
 			return maxCellScore.score + score;
-			// } else {
-			// 	return minCellScore.score;
-			// }
 		}
 		return score;
 	}
@@ -208,13 +195,17 @@ export class GameController {
 		this.jadge = new Jadge(this.bord);
 		this.bot = new Bot(this.bord);
 	}
+	reset() {
+		this.winner = '';
+		this.bord.reset();
+	}
 	setStone(n) {
 		if (this.jadge.isPutStoneByN(n, this.is_user ? 1 : 2) === 1) {
 			if (this.is_user) {
 				this.bord.setStone(n, 1);
 				// this.is_user = !this.is_user;
 				this.is_win(n, this.is_user ? 1 : 2);
-				const botStoneIndex = this.bot.setStone(2);
+				const botStoneIndex = this.bot.setStone(this.is_user ? 2 : 1);
 				this.bord.setStone(botStoneIndex, 2);
 				this.is_win(botStoneIndex, this.is_user ? 2 : 1);
 			}

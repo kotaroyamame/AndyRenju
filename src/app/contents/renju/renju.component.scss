@@ -1,10 +1,44 @@
 $bordWidth:830px;
 $bordSize:15;
+.andyGomoku{
+	&__title{
+		font-size: 22px;
+		margin:auto;
+		padding:20px;
+	}
+}
+.resetWrap{
+	text-align: center;
+	margin:30px;
+	&__button{
 
+	}
+}
+.winner{
+	position: absolute;
+	top:0;left:0;right:0;bottom:0;
+	width: $bordWidth;
+	height: $bordWidth;
+	background-color: rgba(255, 255, 255, 0.424);
+	line-height: $bordWidth;
+	color:#000;
+	font-size: 70px;
+	text-align: center;
+	z-index: 9;
+}
+.bordWrapper{
+	position: relative;
+	margin:auto;
+	width: $bordWidth;
+	height: $bordWidth;
+}
 .bord {
+	margin:auto;
 	width: $bordWidth;
 	height: $bordWidth;
 	background-color: burlywood;
+	border: 2px solid rgb(102, 74, 38);
+	box-shadow: dimgrey 3px 3px 3px;
 	&__cell {
 		width: ($bordWidth/$bordSize);
 		height: ($bordWidth/$bordSize);
@@ -46,6 +80,7 @@ $bordSize:15;
 		display:block;
 		width: ($bordWidth/$bordSize);
 		height: ($bordWidth/$bordSize);
+		box-shadow: dimgrey 3px 3px 3px;
 		&--white {
 			background-color: white;
 		}

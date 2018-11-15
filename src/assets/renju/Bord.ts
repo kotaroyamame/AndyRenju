@@ -9,6 +9,12 @@ export class Bord {
 			this.cellObj[n] = { stone: 0 };
 		});
 	}
+	reset() {
+		// tslint:disable-next-line:forin
+		for (const key in this.cellObj) {
+			this.cellObj[key] = { stone: 0 };
+		}
+	}
 	public copy() {
 		const newBord = new Bord(this.size);
 		newBord.setCellObj(this.getCellObj());

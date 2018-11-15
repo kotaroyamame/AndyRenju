@@ -1,12 +1,19 @@
-<p>
-  連珠
-</p>
 <div class="andyGomoku">
-  <div>{{gameController.winner}}</div>
-  <ul class="bord">
-    <li class="bord__cell" *ngFor="let i of gameController.bord.getCellKeys();" (click)="gameController.setStone(i)">
-      <span class="bord__stone bord__stone--black" *ngIf="gameController.bord.getCell(i).stone==1"></span>
-      <span class="bord__stone bord__stone--white" *ngIf="gameController.bord.getCell(i).stone==2"></span>
-    </li>
-  </ul>
+	<h1 class="andyGomoku__title">
+		連珠
+	</h1>
+	
+	<div class="bordWrapper">
+		<ul class="bord">
+			<li class="bord__cell" *ngFor="let i of gameController.bord.getCellKeys();" (click)="gameController.setStone(i)">
+				<span class="bord__stone bord__stone--black" *ngIf="gameController.bord.getCell(i).stone==1"></span>
+				<span class="bord__stone bord__stone--white" *ngIf="gameController.bord.getCell(i).stone==2"></span>
+			</li>
+    </ul>
+    <div class="winner" *ngIf="gameController.winner!==''">{{gameController.winner}}</div>
+  </div>
+  <p class="resetWrap">
+    <button mat-stroked-button class="resetWrap__button" (click)="gameController.reset()">リセット</button>
+  </p>
+
 </div>
