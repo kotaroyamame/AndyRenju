@@ -2,19 +2,41 @@ import { Bord } from './Bord';
 export class Jadge {
 	constructor(private bord: Bord) { }
 	// 1=石は置ける 0=すでにあるので置けない -1=反則で置けない
+	isPutStoneByN(n: number, stone: 1 | 2): 0 | 1 | -1 {
+		const pt = this.bord.getStoneByN(n);
+		if (pt === 1 || pt === 2) {
+			return 0;
+		}
+		const hansoku = this.isHansoku(n, stone);
+		if (hansoku === 1) {
+			return -1;
+		}
+		return 1;
+	}
 	isPutStone(x: number, y: number, stone: 1 | 2): 0 | 1 | -1 {
 		const pt = this.bord.getStone(x, y);
 		if (pt === 1 || pt === 2) {
 			return 0;
 		}
+		const hansoku = this.isHansoku(this.xyToN(x, y), stone);
+		if (hansoku === 1) {
+			return -1;
+		}
 		return 1;
 	}
-	public isHansoku(n: number): number {
+	private xyToN(x: number, y: number): number {
+		return y * this.bord.x + x;
+	}
+	private nToXY(n: number): number[] {
+		return [n % this.bord.y, Math.floor(n / this.bord.x)];
+	}
+	public isHansoku(n: number, stoneColor: 1 | 2): 0 | 1 {
 		let tr_tr = 0;
+		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
-			const { type, size, edgeScore } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			const { type, size, edgeScore } = this.search(x, y, j);
 			console.log(edgeScore);
-			if (type === 1 && size === 3 && edgeScore === 2) {
+			if (stoneColor === 1 && type === 1 && size === 3 && edgeScore === 2) {
 				tr_tr += 1;
 				if (tr_tr >= 2) {
 					return 1;
@@ -24,8 +46,9 @@ export class Jadge {
 		return 0;
 	}
 	public isGemeOver(n: number): 0 | 1 | 2 {
+		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
-			const { type, size, edgeScore } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			const { type, size, edgeScore } = this.search(x, y, j);
 			console.log(edgeScore);
 			if (type === 1 && size === 5) {
 				return 1;
@@ -71,7 +94,7 @@ export class Jadge {
 	}
 	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
 		if (stack.length <= 1 || stack[1] !== 0) {
-			if (stack.length > 1 && this.bord.getStone(x, y) !== stack[1]) {
+			if (stack.length > 1 && this.bord.getStone(x, y) !== stack[1] || (stack.length === 1 && this.bord.getStone(x, y) === 0)) {
 				// 反転して最初から一つ進む
 				if (vc <= 4) {
 					vc += 4;
@@ -89,7 +112,7 @@ export class Jadge {
 						x = _x; y = _y;
 					}
 					edgeScore += this.bord.getStone(x, y) === 0 ? 1 : 0;
-					return { type: stack[0], size: stack.length, edgeScore: edgeScore };
+					return { type: stack[1], size: stack.length, edgeScore: edgeScore };
 				}
 			}
 			stack.push(this.bord.getStone(x, y));
@@ -156,9 +179,11 @@ export class GameController {
 		this.bot = new Bot(this.bord);
 	}
 	setStone(n) {
-		this.bord.setStone(n, this.is_user ? 1 : 2);
-		this.is_user = !this.is_user;
-		this.is_win(n);
+		if (this.jadge.isPutStoneByN(n, this.is_user ? 1 : 2) === 1) {
+			this.bord.setStone(n, this.is_user ? 1 : 2);
+			this.is_user = !this.is_user;
+			this.is_win(n);
+		}
 	}
 	is_win(n) {
 		const k = this.jadge.isGemeOver(n);
@@ -169,10 +194,3 @@ export class GameController {
 		}
 	}
 }
-// function search(ar=[]){
-//     ar.push(1);
-//     if(ar.length>5){
-//         return ar;
-//     }
-//     return search(ar);
-// }
