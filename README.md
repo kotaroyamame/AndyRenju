@@ -7,7 +7,7 @@ Angular7で連珠を作ってみました。
 # demo
 
 動作デモ
-https://iidesign.website/andytools/AndyRenju/renju
+https://iidesign.website/andytools/AndyRenju/
 
 ## Development server
 
