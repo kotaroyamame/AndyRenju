@@ -46,11 +46,14 @@ export class Jadge {
 		}
 		return 0;
 	}
-	public isGemeOver(n: number): 0 | 1 | 2 {
+	public isGemeOver(n: number, stoneColor: 1 | 2): 0 | 1 | 2 {
 		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
 			const { type, size, edgeScore } = this.search(x, y, j);
 			console.log(edgeScore);
+			if (stoneColor !== type) {
+				continue;
+			}
 			if (type === 1 && size === 5) {
 				return 1;
 			} else if (type === 2 && size >= 5) {
@@ -134,7 +137,7 @@ export class Jadge {
 export class Bot {
 	constructor(private bord: Bord) {
 	}
-	decision(index: number | string, stone: 1 | 2) {
+	decision(index: number | string, stone: 1 | 2, count: number = 3) {
 		index = typeof index === 'number' ? index : parseInt(index, 10);
 		let score = -1;
 		const mindBord = this.bord.copy();
@@ -145,6 +148,13 @@ export class Bot {
 				const { type, size, edgeScore } = jadge.searchByN(index, j);
 				score += Math.pow(size, 2) + edgeScore;
 			}
+			// const bordCellObj = this.bord.getCellObj();
+			// const cellScoreList = [];
+			// // tslint:disable-next-line:forin
+			// for (const _index in bordCellObj) {
+			// 	const cell = bordCellObj[index];
+			// 	cellScoreList.push({ index: index, score: this.decision(index, stone) });
+			// }
 		}
 		return score;
 	}
@@ -162,7 +172,7 @@ export class Bot {
 				maxScoreCell = cellScoreList[i];
 			}
 		}
-		this.bord.setStone(maxScoreCell.index, stone);
+		return maxScoreCell.index;
 	}
 
 }
@@ -180,13 +190,15 @@ export class GameController {
 			if (this.is_user) {
 				this.bord.setStone(n, 1);
 				// this.is_user = !this.is_user;
-				this.is_win(n);
-				this.bot.setStone(2);
+				this.is_win(n, this.is_user ? 1 : 2);
+				const botStoneIndex = this.bot.setStone(2);
+				this.bord.setStone(botStoneIndex, 2);
+				this.is_win(botStoneIndex, this.is_user ? 2 : 1);
 			}
 		}
 	}
-	is_win(n) {
-		const k = this.jadge.isGemeOver(n);
+	is_win(n, stone) {
+		const k = this.jadge.isGemeOver(n, stone);
 		if (k === 1) {
 			this.winner = '先手の勝ちです';
 		} else if (k === 2) {
