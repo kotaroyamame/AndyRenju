@@ -36,7 +36,6 @@ export class Jadge {
 		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
 			const { type, size, edgeScore } = this.search(x, y, j);
-			console.log(edgeScore);
 			if (stoneColor === 1 && type === 1 && size === 3 && edgeScore === 2) {
 				tr_tr += 1;
 				if (tr_tr >= 2) {
@@ -50,7 +49,6 @@ export class Jadge {
 		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
 			const { type, size, edgeScore } = this.search(x, y, j);
-			console.log(edgeScore);
 			if (stoneColor !== type) {
 				continue;
 			}
@@ -137,23 +135,48 @@ export class Jadge {
 export class Bot {
 	constructor(private bord: Bord) {
 	}
-	decision(index: number | string, stone: 1 | 2, count: number = 3) {
+	decision(mindBord: Bord, index: number | string, stone: 1 | 2, count: number = 2) {
 		index = typeof index === 'number' ? index : parseInt(index, 10);
 		let score = -1;
-		const mindBord = this.bord.copy();
 		const jadge = new Jadge(mindBord);
 		if (jadge.isPutStoneByN(index, stone) === 1) {
 			score = 0;
 			for (let j = 1; j <= 4; j++) {
 				const { type, size, edgeScore } = jadge.searchByN(index, j);
-				score += Math.pow(size, 2) + edgeScore;
+				if (type !== stone) {
+					score += Math.pow(size - 1, 2) + Math.pow(edgeScore, 2);
+				} else {
+					score += Math.pow(size - 1, 2) + Math.pow(edgeScore, 2);
+				}
+
 			}
-			// const bordCellObj = this.bord.getCellObj();
-			// const cellScoreList = [];
-			// // tslint:disable-next-line:forin
-			// for (const _index in bordCellObj) {
-			// 	const cell = bordCellObj[index];
-			// 	cellScoreList.push({ index: index, score: this.decision(index, stone) });
+			console.log(score);
+			if (count <= 0 || score <= 28) {
+				return score;
+			}
+			mindBord.getStoneByN(index);
+			const bordCellObj = mindBord.getCellObj();
+			let maxCellScore = null;
+			// let minCellScore = null;
+			// tslint:disable-next-line:forin
+			for (const _index in bordCellObj) {
+				// const cell = bordCellObj[_index];
+				const cellScore = { index: _index, score: this.decision(mindBord, _index, stone === 1 ? 2 : 1, count--) };
+				// if (stone === 1) {
+				if (maxCellScore === null || maxCellScore.score < cellScore.score) {
+					maxCellScore = cellScore;
+				}
+				// } else {
+				// 	if (minCellScore === null || minCellScore.score > cellScore.score) {
+				// 		minCellScore = cellScore;
+				// 	}
+				// }
+
+			}
+			// if (stone === 1) {
+			return maxCellScore.score + score;
+			// } else {
+			// 	return minCellScore.score;
 			// }
 		}
 		return score;
@@ -163,8 +186,8 @@ export class Bot {
 		const bordCellObj = this.bord.getCellObj();
 		// tslint:disable-next-line:forin
 		for (const index in bordCellObj) {
-			const cell = bordCellObj[index];
-			cellScoreList.push({ index: index, score: this.decision(index, stone) });
+			// const cell = bordCellObj[index];
+			cellScoreList.push({ index: index, score: this.decision(this.bord.copy(), index, stone, 2) });
 		}
 		let maxScoreCell = cellScoreList[0];
 		for (let i = 1; i < cellScoreList.length; i++) {
