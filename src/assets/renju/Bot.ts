@@ -1,6 +1,6 @@
 import { Bord } from './Bord';
 export class Jadge {
-	constructor(private bord: Bord) {}
+	constructor(private bord: Bord) { }
 	// 1=石は置ける 0=すでにあるので置けない -1=反則で置けない
 	isPutStone(x: number, y: number, stone: 1 | 2): 0 | 1 | -1 {
 		const pt = this.bord.getStone(x, y);
@@ -9,10 +9,23 @@ export class Jadge {
 		}
 		return 1;
 	}
-
+	public isHansoku(n: number): number {
+		let tr_tr = 0;
+		for (let j = 1; j <= 4; j++) {
+			const { type, size, edgeScore } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			console.log(edgeScore);
+			if (type === 1 && size === 3 && edgeScore === 2) {
+				tr_tr += 1;
+				if (tr_tr >= 2) {
+					return 1;
+				}
+			}
+		}
+		return 0;
+	}
 	public isGemeOver(n: number): 0 | 1 | 2 {
 		for (let j = 1; j <= 4; j++) {
-			const { type, size , edgeScore} = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
+			const { type, size, edgeScore } = this.search(n % this.bord.y, Math.floor(n / this.bord.x), j);
 			console.log(edgeScore);
 			if (type === 1 && size === 5) {
 				return 1;
@@ -57,8 +70,8 @@ export class Jadge {
 		return [x, y];
 	}
 	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
-		if (stack.length === 0 || stack[0] !== 0) {
-			if (stack.length !== 0 && this.bord.getStone(x, y) !== stack[0]) {
+		if (stack.length <= 1 || stack[1] !== 0) {
+			if (stack.length > 1 && this.bord.getStone(x, y) !== stack[1]) {
 				// 反転して最初から一つ進む
 				if (vc <= 4) {
 					vc += 4;
@@ -80,7 +93,7 @@ export class Jadge {
 				}
 			}
 			stack.push(this.bord.getStone(x, y));
-		} else if (stack[0] === 0) {
+		} else if (stack[1] === 0) {
 			return { type: 0, size: 0, edgeScore: 0 };
 		}
 		// tslint:disable-next-line:no-unused-expression
