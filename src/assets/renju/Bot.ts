@@ -13,6 +13,7 @@ export class Jadge {
 		}
 		return 1;
 	}
+	// 1=石は置ける 0=すでにあるので置けない -1=反則で置けない
 	isPutStone(x: number, y: number, stone: 1 | 2): 0 | 1 | -1 {
 		const pt = this.bord.getStone(x, y);
 		if (pt === 1 || pt === 2) {
@@ -92,9 +93,14 @@ export class Jadge {
 		}
 		return [x, y];
 	}
-	private search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
+	public searchByN(n: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
+		const [x, y] = this.nToXY(n);
+		const { type, size, edgeScore } = this.search(x, y, vc);
+		return { type, size, edgeScore };
+	}
+	public search(x: number, y: number, vc: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | any, stack: Array<0 | 1 | 2> | any = []): { type: 0 | 1 | 2, size: number, edgeScore: number } {
 		if (stack.length <= 1 || stack[1] !== 0) {
-			if (stack.length > 1 && this.bord.getStone(x, y) !== stack[1] || (stack.length === 1 && this.bord.getStone(x, y) === 0)) {
+			if (stack.length > 1 && this.bord.getStone(x, y) !== stack[1] || (stack.length === 1 && this.bord.getStone(x, y) <= 0)) {
 				// 反転して最初から一つ進む
 				if (vc <= 4) {
 					vc += 4;
@@ -105,18 +111,18 @@ export class Jadge {
 					return this.search(x, y, vc, stack);
 				} else {
 					// edgeScore 石の端の空間が空いているかどうか、0空いてない 1一方こうだけ空いてる 2両方空いてる
-					let edgeScore = this.bord.getStone(x, y) === 0 ? 1 : 0;
+					let edgeScore = this.bord.getStone(x, y) <= 0 ? 1 : 0;
 					vc -= 4;
 					for (let i = 0; i < stack.length + 1; i++) {
 						const [_x, _y] = this.advance(x, y, vc);
 						x = _x; y = _y;
 					}
-					edgeScore += this.bord.getStone(x, y) === 0 ? 1 : 0;
+					edgeScore += this.bord.getStone(x, y) <= 0 ? 1 : 0;
 					return { type: stack[1], size: stack.length, edgeScore: edgeScore };
 				}
 			}
 			stack.push(this.bord.getStone(x, y));
-		} else if (stack[1] === 0) {
+		} else if (stack[1] <= 0) {
 			return { type: 0, size: 0, edgeScore: 0 };
 		}
 		// tslint:disable-next-line:no-unused-expression
@@ -128,46 +134,37 @@ export class Jadge {
 export class Bot {
 	constructor(private bord: Bord) {
 	}
-	decision(index: number | string) {
+	decision(index: number | string, stone: 1 | 2) {
 		index = typeof index === 'number' ? index : parseInt(index, 10);
 		let score = -1;
-
-		const bordCellObj = this.bord.getCellObj();
-		if (bordCellObj[index].stone !== 0) {
-			return score;
-		}
-		const roundMap = [1, -1, this.bord.x, -this.bord.x, -this.bord.x + 1, this.bord.x + 1, this.bord.x - 1, -this.bord.x - 1];
-
-		for (let i = 0; i < roundMap.length; i++) {
-			if (bordCellObj.hasOwnProperty(roundMap[i] + index)) {
-				if (bordCellObj[roundMap[i] + index].stone === 1) {
-					score = score + 1;
-				} else if (bordCellObj[roundMap[i] + index].stone === 2) {
-					score = score + 3;
-				}
+		const mindBord = this.bord.copy();
+		const jadge = new Jadge(mindBord);
+		if (jadge.isPutStoneByN(index, stone) === 1) {
+			score = 0;
+			for (let j = 1; j <= 4; j++) {
+				const { type, size, edgeScore } = jadge.searchByN(index, j);
+				score += Math.pow(size, 2) + edgeScore;
 			}
 		}
 		return score;
 	}
-	setStone() {
-		let cellScoreList = [];
+	setStone(stone: 1 | 2) {
+		const cellScoreList = [];
 		const bordCellObj = this.bord.getCellObj();
 		// tslint:disable-next-line:forin
 		for (const index in bordCellObj) {
 			const cell = bordCellObj[index];
-			cellScoreList.push({ index: index, score: this.decision(index) });
+			cellScoreList.push({ index: index, score: this.decision(index, stone) });
 		}
-		cellScoreList = cellScoreList.sort((a, b) => {
-			if (a.score > b.score) {
-				return -1;
+		let maxScoreCell = cellScoreList[0];
+		for (let i = 1; i < cellScoreList.length; i++) {
+			if (maxScoreCell.score < cellScoreList[i].score) {
+				maxScoreCell = cellScoreList[i];
 			}
-			if (a.score < b.score) {
-				return 1;
-			}
-			return 0;
-		});
-		this.bord.setStone(cellScoreList[0].index, 1);
+		}
+		this.bord.setStone(maxScoreCell.index, stone);
 	}
+
 }
 export class GameController {
 	is_user = true;
@@ -180,9 +177,12 @@ export class GameController {
 	}
 	setStone(n) {
 		if (this.jadge.isPutStoneByN(n, this.is_user ? 1 : 2) === 1) {
-			this.bord.setStone(n, this.is_user ? 1 : 2);
-			this.is_user = !this.is_user;
-			this.is_win(n);
+			if (this.is_user) {
+				this.bord.setStone(n, 1);
+				// this.is_user = !this.is_user;
+				this.is_win(n);
+				this.bot.setStone(2);
+			}
 		}
 	}
 	is_win(n) {

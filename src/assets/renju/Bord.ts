@@ -2,15 +2,23 @@ export class Bord {
 	x: number;
 	y: number;
 	private cellObj: { [n: number]: { [stone: string]: 0 | 1 | 2 } };
-	constructor(size: number) {
+	constructor(private size: number) {
 		this.x = this.y = size;
 		this.cellObj = {};
 		[...Array(Math.pow(size, 2)).keys()].forEach(n => {
 			this.cellObj[n] = { stone: 0 };
 		});
 	}
-	public getCellObj(): Object {
+	public copy() {
+		const newBord = new Bord(this.size);
+		newBord.setCellObj(this.getCellObj());
+		return newBord;
+	}
+	public getCellObj(): { [n: number]: { [stone: string]: 0 | 1 | 2 } } {
 		return this.cellObj;
+	}
+	public setCellObj(cellObj: { [n: number]: { [stone: string]: 0 | 1 | 2 } }) {
+		this.cellObj = Object.assign({}, cellObj);
 	}
 	public getCellKeys(): number[] {
 		return Object.keys(this.cellObj).map(o => parseInt(o, 10));
