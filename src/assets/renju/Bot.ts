@@ -36,7 +36,7 @@ export class Jadge {
 		const [x, y] = this.nToXY(n);
 		for (let j = 1; j <= 4; j++) {
 			const { type, size, edgeScore } = this.search(x, y, j);
-			if (stoneColor === 1 && type === 1 && size === 3 && edgeScore === 2) {
+			if (stoneColor === 1 && type === 1 && size === 3 && edgeScore >= 2) {
 				tr_tr += 1;
 				if (tr_tr >= 2) {
 					return 1;
@@ -111,14 +111,24 @@ export class Jadge {
 					}
 					return this.search(x, y, vc, stack);
 				} else {
-					// edgeScore 石の端の空間が空いているかどうか、0空いてない 1一方こうだけ空いてる 2両方空いてる
+					// edgeScore 石の端の空間が空いているかどうか、0空いてない 1一方こうだけ空いてる 2両方空いてる 0.5二つ先も空いている
 					let edgeScore = this.bord.getStone(x, y) <= 0 ? 1 : 0;
+					if (edgeScore === 1) {
+						for (let i = 0; i < 1; i++) {
+							const [_x, _y] = this.advance(x, y, vc);
+							x = _x; y = _y;
+						}
+						edgeScore = this.bord.getStone(x, y) <= 0 ? 0.5 : 0;
+					}
+					// 反転
 					vc -= 4;
-					for (let i = 0; i < stack.length + 1; i++) {
+					for (let i = 0; i < stack.length + 2; i++) {
 						const [_x, _y] = this.advance(x, y, vc);
 						x = _x; y = _y;
+						if (i >= stack.length) {
+							edgeScore += this.bord.getStone(x, y) <= 0 ? 1 - (0.5 * (i - stack.length)) : 0;
+						}
 					}
-					edgeScore += this.bord.getStone(x, y) <= 0 ? 1 : 0;
 					return { type: stack[1], size: stack.length, edgeScore: edgeScore };
 				}
 			}
@@ -144,9 +154,9 @@ export class Bot {
 			for (let j = 1; j <= 4; j++) {
 				const { type, size, edgeScore } = jadge.searchByN(index, j);
 				if (type !== stone) {
-					score += Math.pow(size - 1, 3) + Math.pow(edgeScore, 4);
+					score += Math.pow(size - 1, 3) + Math.pow(edgeScore - 1, 4);
 				} else {
-					score += Math.pow(size - 1, 3) + Math.pow(edgeScore, 4);
+					score += Math.pow(size - 1, 3) + Math.pow(edgeScore - 1, 4);
 				}
 
 			}
@@ -174,7 +184,7 @@ export class Bot {
 		// tslint:disable-next-line:forin
 		for (const index in bordCellObj) {
 			// const cell = bordCellObj[index];
-			cellScoreList.push({ index: index, score: this.decision(this.bord.copy(), index, stone, 2) });
+			cellScoreList.push({ index: index, score: this.decision(this.bord.copy(), index, stone, 4) });
 		}
 		let maxScoreCell = cellScoreList[0];
 		for (let i = 1; i < cellScoreList.length; i++) {
