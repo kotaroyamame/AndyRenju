@@ -4,8 +4,9 @@ ul {
 }
 .nav {
     &__title {
-        font-size: 14px;
-        padding-left: 20px;
+        // font-size: 14px;
+        // padding-left: 20px;
+        font-weight: bold;
         cursor: pointer;
         &.active {
             // background-color:rgba(0,0,0,0.2);

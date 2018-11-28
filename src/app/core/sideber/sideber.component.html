@@ -1,16 +1,20 @@
-<p>
-  sideber works!
-</p>
 <nav>
-    <h1 class="nav__title" routerLink="/" routerLinkActive="active">top</h1>
-  <h1 class="nav__title">Works</h1>
-  <ul>
-    <li class="nav__list" routerLinkActive="active" routerLink="/renju">
-      <span class="nav__link">Renju</span>
-    </li>
-    <li class="nav__list" routerLinkActive="active" routerLink="/chat">
-      <span class="nav__link">Chat</span>
-    </li>
-  </ul>
+	<mat-list>
+    <h1 matSubheader class="nav__title" routerLink="/" routerLinkActive="active">top</h1>
+    <mat-list-item class="nav__list" routerLinkActive="active" routerLink="/profile">
+			<span class="nav__link">Profile</span>
+		</mat-list-item>
+		<h1 matSubheader class="nav__title">Works</h1>
+		<mat-list-item class="nav__list" routerLinkActive="active" routerLink="/renju">
+			<span class="nav__link">Renju</span>
+		</mat-list-item>
+		<mat-list-item class="nav__list" routerLinkActive="active" routerLink="/chat">
+			<span class="nav__link">Chat</span>
+		</mat-list-item>
+	</mat-list>
 
 </nav>
+<!-- <mat-drawer-container class="nav">
+  <mat-drawer mode="side" opened>Drawer content</mat-drawer>
+  <mat-drawer-content>Main content</mat-drawer-content>
+</mat-drawer-container> -->

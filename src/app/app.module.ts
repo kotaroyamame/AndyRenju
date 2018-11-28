@@ -10,6 +10,10 @@ import { CoreModule } from './core/core.module';
 import { ChatComponent } from './contents/chat/chat.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule, MatCheckboxModule} from '@angular/material';
+import { ServiceComponent } from './contents/service/service.component';
+import { ContactComponent } from './contents/contact/contact.component';
+import { ProfileComponent } from './contents/profile/profile.component';
+import { SiteComponent } from './contents/site/site.component';
 
 @NgModule({
 	declarations: [
@@ -18,6 +22,10 @@ import {MatButtonModule, MatCheckboxModule} from '@angular/material';
 		ContentsComponent,
 		TopComponent,
 		ChatComponent,
+		ServiceComponent,
+		ContactComponent,
+		ProfileComponent,
+		SiteComponent,
 	],
 	imports: [
 		BrowserModule,

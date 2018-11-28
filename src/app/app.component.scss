@@ -20,6 +20,6 @@ app-root{
         height:100%;
     }
     &-content{
-        padding-left:$sideberWidth;
+        padding-left:$sideberWidth + 20px;
     }
 }
